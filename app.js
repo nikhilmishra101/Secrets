@@ -45,9 +45,11 @@ app
         console.log(err);
       } else {
         if (foundUser) {
-          if (foundUser.password === password) {
-            res.render("secrets");
-          }
+          bcrypt.compare(password, foundUser.password, function (err, result) {
+            if (result === true) {
+              res.render("secrets");
+            }
+          });
         }
       }
     });
@@ -74,7 +76,7 @@ app
     });
   });
 
-app.post("/logout", function (req, res) {
+app.get("/logout", function (req, res) {
   res.redirect("/");
 });
 
