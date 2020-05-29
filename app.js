@@ -12,3 +12,27 @@ app.use(
     extended: true,
   })
 );
+
+mongoose.connect("mongodb://localhost:27017/secretsDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const userSchema = app.route("/").get(function (req, res) {
+  res.render("home");
+});
+app.route("/login").get(function (req, res) {
+  res.render("login");
+});
+app.route("/register").get(function (req, res) {
+  res.render("register");
+});
+
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 3000;
+}
+
+app.listen(port, function (req, res) {
+  console.log("Server has started Successfully");
+});
