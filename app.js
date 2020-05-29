@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const ejs = require("ejs");
+const encrypt = require("mongoose-encryption");
 
 const app = express();
 
@@ -18,19 +19,40 @@ mongoose.connect("mongodb://localhost:27017/secretsDB", {
   useUnifiedTopology: true,
 });
 
-const userSchema = {
+const userSchema = new mongoose.Schema({
   email: String,
   password: String,
-};
+});
+
+const secret = "Thisisourlittlesecret";
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
 
 const User = new mongoose.model("User", userSchema);
 
 app.route("/").get(function (req, res) {
   res.render("home");
 });
-app.route("/login").get(function (req, res) {
-  res.render("login");
-});
+app
+  .route("/login")
+  .get(function (req, res) {
+    res.render("login");
+  })
+  .post(function (req, res) {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    User.findOne({ email: username }, function (err, foundUser) {
+      if (err) {
+        console.log(err);
+      } else {
+        if (foundUser) {
+          if (foundUser.password === password) {
+            res.render("secrets");
+          }
+        }
+      }
+    });
+  });
 app
   .route("/register")
   .get(function (req, res) {
