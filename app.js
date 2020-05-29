@@ -3,8 +3,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const ejs = require("ejs");
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
+const session = require("express-session");
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const app = express();
 
