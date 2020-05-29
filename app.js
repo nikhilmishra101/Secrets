@@ -18,15 +18,38 @@ mongoose.connect("mongodb://localhost:27017/secretsDB", {
   useUnifiedTopology: true,
 });
 
-const userSchema = app.route("/").get(function (req, res) {
+const userSchema = {
+  email: String,
+  password: String,
+};
+
+const User = new mongoose.model("User", userSchema);
+
+app.route("/").get(function (req, res) {
   res.render("home");
 });
 app.route("/login").get(function (req, res) {
   res.render("login");
 });
-app.route("/register").get(function (req, res) {
-  res.render("register");
-});
+app
+  .route("/register")
+  .get(function (req, res) {
+    res.render("register");
+  })
+  .post(function (req, res) {
+    const newUser = new User({
+      email: req.body.username,
+      password: req.body.password,
+    });
+
+    newUser.save(function (err) {
+      if (!err) {
+        res.render("secrets");
+      } else {
+        console.log(err);
+      }
+    });
+  });
 
 let port = process.env.PORT;
 if (port == null || port == "") {
