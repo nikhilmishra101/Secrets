@@ -45,8 +45,14 @@ userSchema.plugin(findOrCreate);
 const User = new mongoose.model("User", userSchema);
 
 passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+passport.deserializeUser(function (id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
+  });
+});
 
 passport.use(
   new GoogleStrategy(
@@ -68,9 +74,18 @@ app.route("/").get(function (req, res) {
   res.render("home");
 });
 
-app.get("/auth/google", function (req, res) {
-  passport.authenticate("google", { scope: ["profile"] });
-});
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile"] })
+);
+
+app.get(
+  "/auth/google/secrets",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  function (req, res) {
+    res.redirect("/secrets");
+  }
+);
 app
   .route("/login")
   .get(function (req, res) {
