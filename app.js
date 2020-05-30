@@ -67,6 +67,10 @@ passport.use(
 app.route("/").get(function (req, res) {
   res.render("home");
 });
+
+app.get("/auth/google", function (req, res) {
+  passport.authenticate("google", { scope: ["profile"] });
+});
 app
   .route("/login")
   .get(function (req, res) {
@@ -87,6 +91,7 @@ app
       }
     });
   });
+
 app
   .route("/register")
   .get(function (req, res) {
